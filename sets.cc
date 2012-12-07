@@ -24,9 +24,11 @@ class comp {
 public:
     bool precedes(T a, T b) {
         // your code here
+        return a < b;
     }
     bool equals(T a, T b) {
         // your code here
+        return a == b;
     }
 };
 
@@ -156,6 +158,7 @@ class increment {
 public:
     T operator()(T a) {
         // your code here
+        return  a + 1;
     }
 };
 
@@ -309,3 +312,4 @@ int main() {
     if (X->contains(8)) cout << "8 is now in X\n";
     if (X->contains(9)) cout << "9 is now in X\n";
 }
+
