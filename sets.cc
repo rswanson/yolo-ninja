@@ -264,6 +264,49 @@ public:
 
 // insert an appropriate carray_range_set declaration here
 
+template<class T>
+class carray_range_set : public virtual simple_set<T> {
+    // 'virtual' on simple_set ensures single copy if multiply inherited
+    // needs some data members
+    std::vector<int> carr;
+    int low;
+    int high;
+public:
+
+    //SET = {monday, tuesday, wednesday, thursday, friday}
+    // fill in these methods:
+    carray_range_set(T l, T h) { 
+        carr.resize(h,0);
+        low= (int) l;
+        high= (int) h;
+    }     // constructor
+    virtual ~carray_range_set() { }
+    virtual carray_range_set<T>& operator+=(range<T, C> r) { 
+        
+
+        /* 
+        int intrep = (int) item;        
+        carr.insert(carr.begin() + intrep, 1);      
+        */
+    }
+    virtual carray_range_set<T>& operator-=(range<T, C> r) { 
+        int intrep = (int) item;
+        carr[intrep] = 1;       
+    }
+    virtual bool contains(range<T, C> r) { 
+        
+        int intrep = (int) item;
+            for (T i = r.low(); r.contains(i); i = inc(i)) {
+                if (carr[intrep] == 0){
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+    }
+};
+
 //---------------------------------------------------------------
 
 // insert an appropriate hashed_range_set declaration here
