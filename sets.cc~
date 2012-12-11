@@ -93,27 +93,31 @@ class carray_simple_set : public virtual simple_set<T> {
     // 'virtual' on simple_set ensures single copy if multiply inherited
     // needs some data members
 	//std::vector<int> carr;
-	int* carr;
+    int *carr;
 	int low;
 	int high;
 public:
 
     //SET = {monday, tuesday, wednesday, thursday, friday}
     // fill in these methods:
-    carray_simple_set(T l, T h) { 
-		carr = new int[h];
-		//carr.resize(h,0);
+    carray_simple_set(T l, T h) {
 		low= (int) l;
 		high= (int) h;
-    }     // constructor
+		carr= new int[high-low];	
+    }   // constructor
     virtual ~carray_simple_set() { }
-    virtual carray_simple_set<T>& operator+=(T item) {         
-		int intrep = (int) item;		
-		carr[intrep] = 1;	
+    virtual carray_simple_set<T>& operator+=(T item) {         				
+		int intrep = (int)item;		
+		carr[intrep] = 1;
+		//*(carr+intrep) = 1;
+		//cout << sizeof(carr)/sizeof(int) << "\n\n\n\n";
+		//cout << "";	
+		return *this;	
     }
     virtual carray_simple_set<T>& operator-=(T item) { 
-	    int intrep = (int) item;
-		carr[intrep] = 0;	    
+		
+		carr[(int)item] = 0;
+		return *this;
     }
     virtual bool contains(T item) { 
     	
@@ -124,6 +128,8 @@ public:
     	else{
     		return false;
     	}
+    	
+    	return false;
     	
     }
 };
