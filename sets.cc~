@@ -92,7 +92,8 @@ template<class T>
 class carray_simple_set : public virtual simple_set<T> {
     // 'virtual' on simple_set ensures single copy if multiply inherited
     // needs some data members
-    std::vector<int> carr;
+	//std::vector<int> carr;
+	int* carr;
 	int low;
 	int high;
 public:
@@ -100,19 +101,19 @@ public:
     //SET = {monday, tuesday, wednesday, thursday, friday}
     // fill in these methods:
     carray_simple_set(T l, T h) { 
-		carr.resize(h,0);
+		carr = new int[h];
+		//carr.resize(h,0);
 		low= (int) l;
 		high= (int) h;
     }     // constructor
     virtual ~carray_simple_set() { }
-    virtual carray_simple_set<T>& operator+=(T item) { 
-
+    virtual carray_simple_set<T>& operator+=(T item) {         
 		int intrep = (int) item;		
-		carr.insert(carr.begin() + intrep, 1);		
+		carr[intrep] = 1;	
     }
     virtual carray_simple_set<T>& operator-=(T item) { 
 	    int intrep = (int) item;
-		carr[intrep] = 1;	    
+		carr[intrep] = 0;	    
     }
     virtual bool contains(T item) { 
     	
