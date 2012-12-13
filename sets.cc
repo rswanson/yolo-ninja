@@ -416,6 +416,7 @@ public:
 // tree_range_set (search tree -- extra credit) would have amortized
 // log-time insert and remove for individual elements _and_ ranges.
 //
+
 template<class T, class C = comp<T>, class I = increment<T> >
 class stl_range_set : public virtual range_set<T, C>, public stl_simple_set<T> {
     // 'virtual' on range_set ensures single copy if multiply inherited
@@ -452,10 +453,36 @@ public:
 
 // insert an appropriate carray_range_set declaration here
 
+template<class T, class C = comp<T>, class I = increment<T> >
+class carray_range_set: public virtual range_set<T, C>, public virtual carray_simple_set<T> {
+    I inc;
+public:
+		carray_range_set(T l, T h) : range_set<T, C>(), carray_simple_set<T>(l, h)  {}	
+    virtual carray_simple_set<T>& operator+=(T item) {
+        return carray_simple_set<T>::operator+=(item);
+    }
+    virtual carray_simple_set<T>& operator-=(T item) {
+        return carray_simple_set<T>::operator-=(item);
+    }
+    virtual bool contains(T item) {
+        return carray_simple_set<T>::contains(item);
+    }
+    virtual range_set<T>& operator+=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+            *this += i;
+        }
+        return *this;
+    }
+    virtual range_set<T>& operator-=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+            *this -= i;
+        }
+        return *this;
+    }
+};
 //---------------------------------------------------------------
 
 // insert an appropriate hashed_range_set declaration here
-
 //---------------------------------------------------------------
 
 // insert an appropriate bin_search_range_set declaration here
@@ -496,7 +523,7 @@ int main() {
     simple_set<weekday>* V = new carray_simple_set<weekday>(mon, (weekday)5);
     simple_set<weekday>* Z = new hashed_set<weekday>(3);
     simple_set<weekday>* W = new bin_search_simple_set<weekday>(3);
-    
+		
     *V += wed;
     *Z += thu;
     *Z += tue;
@@ -510,6 +537,11 @@ int main() {
     if(V->contains(wed)) cout << "WEDNESDAY\n";
     if(Z->contains(fri)) cout << "THURSDAY AND MONDAY\n";
     if(W->contains(fri)) cout << "FRIDAY IN W\n";
+    
+		range_set<int>* E = new carray_range_set<int>(1, 5);
+		*E += range<int>(3,5);
+		if (E->contains(1)) cout << "1 is in E\n";
+		if (E->contains(4)) cout << "4 is in E\n";
 
     stl_simple_set<string> U;
     U += "hello";
