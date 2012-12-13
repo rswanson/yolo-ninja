@@ -92,14 +92,11 @@ template<class T>
 class carray_simple_set : public virtual simple_set<T> {
     // 'virtual' on simple_set ensures single copy if multiply inherited
     // needs some data members
-	//std::vector<int> carr;
     int *carr;
 	int low;
 	int high;
 public:
 
-    //SET = {monday, tuesday, wednesday, thursday, friday}
-    // fill in these methods:
     carray_simple_set(T l, T h) {
 		low= (int) l;
 		high= (int) h;
@@ -107,11 +104,13 @@ public:
     }   // constructor
     virtual ~carray_simple_set() { }
     virtual carray_simple_set<T>& operator+=(T item) {         				
-		int intrep = (int)item;		
-		carr[intrep] = 1;
-		//*(carr+intrep) = 1;
-		//cout << sizeof(carr)/sizeof(int) << "\n\n\n\n";
-		//cout << "";	
+		int intrep = (int)item;
+		if (((intrep < low) == false) && ((intrep < high)==true)){
+			carr[intrep] = 1;			
+		}
+		else{
+			cout << "\n\nYOU TRIED TO INSERT AN ELEMENT NOT IN THE RANGE OF INSERTABLE ELEMENTS.  ERROR.\n\n";
+		}
 		return *this;	
     }
     virtual carray_simple_set<T>& operator-=(T item) { 
@@ -166,7 +165,7 @@ public:
     hashed_set(int n) { 
 		hash = F();			
 		hashTable = new int[n];
-		for(int i=0;i<=sizeof(hashTable)/sizeof(int);i++){
+		for(int i=0;i<n;i++){
 			hashTable[i] = -1;
 		}
 		nextern = n;
@@ -189,9 +188,9 @@ public:
 		int k = 1;
 		while (k!=25){
 			if(hashTable[hashcode%p] == -1){
-				hashTable[hashcode%p] = item;
+				hashTable[hashcode%p] = (int) item;
 				break;
-			}
+			}			
 			else{
 				k++;				
 				hashcode = hashcode * k;
@@ -259,6 +258,9 @@ public:
 				if (hashcode == 0 || hashcode == -1) hashcode = 2;
 			}
 		}
+		if (k==25){
+			cout << "\n\nARRAY IS FULL.  YOU CANNOT INSERT ANY MORE. \n\n";
+		}
 		return false;
     	
     }
@@ -286,10 +288,78 @@ public:
 //
 template<class T>
 class bin_search_simple_set : public virtual simple_set<T> {
-    // 'virtual' on simple_set ensures single copy if multiply inherited
+	 // 'virtual' on simple_set ensures single copy if multiply inherited
     // needs some data members
+    int *binSetarr;
+    int nextern;
 public:
-    // and some methods
+    bin_search_simple_set(int n) { 
+		binSetarr = new int[n];
+		for(int i=0;i<n;i++){
+			binSetarr[i] = -1;
+		}
+		nextern = n;
+	}
+	virtual ~bin_search_simple_set() { }
+    virtual bin_search_simple_set<T>& operator+=(T item) {
+		if(binSetarr[0] == -1){
+			binSetarr[0] = item;
+		}
+		else{
+			int i=0;			
+			
+			while(binSetarr[i] != -1){
+				i++;
+				if (i>nextern){
+					cout << "\n\nARRAY IS FULL.  YOU CANNOT INSERT ANY MORE. \n\n";
+					return *this; 
+				}
+			}
+			
+			if(binSetarr[i-1] < item){
+				binSetarr[i] = item;
+			}
+			else{
+				binSetarr[i] = binSetarr[i-1];
+				binSetarr[i-1] = item;				
+			}
+		}
+		return *this;	
+    }
+    virtual bin_search_simple_set<T>& operator-=(T item) { 
+		int itempos;
+		itempos = binsearch(binSetarr,0,nextern-1,item);
+		binSetarr[itempos] = -1;
+		return *this;
+    }
+    virtual bool contains(T item) {     	
+		if(binsearch(binSetarr,0,nextern-1,item) != -1){
+			return true;
+		}
+		else{
+			return false;
+		}    	
+    }
+    //returns position of element if it is found, or -1 if not found.
+    //idea that helped me implement binary search from http://mathbits.com/MathBits/CompSci/Arrays/Binary.htm
+    virtual int binsearch(int* x, int low, int high, int searchfor){
+    	int middleofarray = (low+high)/2;
+    	while((x[middleofarray] != searchfor) && (low <= high)){
+    		if(x[middleofarray] > searchfor){
+    			high=middleofarray-1;
+    		}
+    		else{
+    			low=middleofarray+1;
+    		}
+    		middleofarray = (low+high)/2;
+    	}
+    	if (low <= high){
+    		return middleofarray;
+    	}
+    	else{
+    		return -1;
+    	}    	
+    }
 };
 
 //===============================================================
@@ -425,14 +495,21 @@ int main() {
 	
     simple_set<weekday>* V = new carray_simple_set<weekday>(mon, (weekday)5);
     simple_set<weekday>* Z = new hashed_set<weekday>(3);
+    simple_set<weekday>* W = new bin_search_simple_set<weekday>(3);
     
     *V += wed;
     *Z += thu;
+    *Z += tue;
+    *Z += fri;
     *Z += mon;
+	*W += fri;
+	*W += wed;
+	*W += tue;
+	*W += mon;
+
     if(V->contains(wed)) cout << "WEDNESDAY\n";
-    if(Z->contains(thu) && Z->contains(mon)) cout << "THURSDAY AND MONDAY\n";
-    *Z -= thu;
-    if(Z->contains(thu)==false) cout << "THURSDAY removed\n";
+    if(Z->contains(fri)) cout << "THURSDAY AND MONDAY\n";
+    if(W->contains(fri)) cout << "FRIDAY IN W\n";
 
     stl_simple_set<string> U;
     U += "hello";
