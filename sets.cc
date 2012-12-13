@@ -141,6 +141,7 @@ public:
 //
 template<class T>
 class cast_to_int {
+	public:
     int operator()(T n) {
         return (int) n;
     }
@@ -157,8 +158,118 @@ template<class T, class F = cast_to_int<T> >
 class hashed_set : public virtual simple_set<T> {
     // 'virtual' on simple_set ensures single copy if multiply inherited
     // needs some data members
+    int *hashTable;
+    F hash;
+    int nextern;
+    int nexterncopy;
 public:
-    hashed_set(int n) { }
+    hashed_set(int n) { 
+		hash = F();			
+		hashTable = new int[n];
+		for(int i=0;i<=sizeof(hashTable)/sizeof(int);i++){
+			hashTable[i] = -1;
+		}
+		nextern = n;
+		nexterncopy = n;		
+	}
+	virtual ~hashed_set() { }
+    virtual hashed_set<T>& operator+=(T item) {
+		int hashcode = hash(item);		
+		if (hashcode == 0 || hashcode == -1) hashcode = 2;
+		int p;
+		if(isprime(nextern)){
+			p = nextern;
+		}
+		else{
+			while(!isprime(nexterncopy)){
+				nexterncopy++;
+			}
+			p = nexterncopy;
+		}
+		int k = 1;
+		while (k!=25){
+			if(hashTable[hashcode%p] == -1){
+				hashTable[hashcode%p] = item;
+				break;
+			}
+			else{
+				k++;				
+				hashcode = hashcode * k;
+				if (hashcode == 0 || hashcode == -1) hashcode = 2;
+			}
+		}
+		if (k==25){
+			cout << "ARRAY FULL!  CANNOT INSERT ANY MORE VALUES\n";
+		}
+		return *this;	
+    }
+    virtual hashed_set<T>& operator-=(T item) { 
+		int hashcode = hash(item);
+		if (hashcode == 0 || hashcode == -1) hashcode = 2;
+		int p;
+		nexterncopy = nextern;
+		if(isprime(nextern)){
+			p = nextern;
+		}
+		else{
+			while(!isprime(nexterncopy)){
+				nexterncopy++;
+			}
+			p = nexterncopy;
+		}
+		int k = 1;
+		while (k!=25){
+			if(hashTable[hashcode%p] == item){
+				hashTable[hashcode%p] = -1;
+				break;
+			}
+			else{
+				k++;				
+				hashcode = hashcode * k;
+				if (hashcode == 0 || hashcode == -1) hashcode = 2;
+			}
+		}
+		return *this;
+    }
+    virtual bool contains(T item) { 
+    	int hashcode = hash(item);
+    	if (hashcode == 0 || hashcode == -1) hashcode = 2;
+		int p;
+		nexterncopy = nextern;
+		if(isprime(nextern)){
+			p = nextern;
+		}
+		else{
+			while(!isprime(nexterncopy)){
+				nexterncopy++;
+			}
+			p = nexterncopy;
+		}
+		int k = 1;
+		while (k!=25){
+			if(hashTable[hashcode%p] == item){
+				return true;
+			}
+			else if (hashTable[hashcode%p] == 0){
+				return false;
+			}
+			else{
+				k++;				
+				hashcode = hashcode * k;
+				if (hashcode == 0 || hashcode == -1) hashcode = 2;
+			}
+		}
+		return false;
+    	
+    }
+    virtual bool isprime(int x){
+    	for(int i=2; i<x; i++){
+			if (x % i == 0){
+				return false;
+			}
+		}
+		return true;
+    }
         // I recommend you pick a hash table size p that is a prime
         // number >= n, use F(e) % p as your hash function, and rehash
         // with kF(e) % p after the kth collision.  (But make sure that
@@ -313,9 +424,15 @@ int main() {
     if (!S->contains(2.718)) cout << "e is not in S\n";
 	
     simple_set<weekday>* V = new carray_simple_set<weekday>(mon, (weekday)5);
+    simple_set<weekday>* Z = new hashed_set<weekday>(3);
     
     *V += wed;
+    *Z += thu;
+    *Z += mon;
     if(V->contains(wed)) cout << "WEDNESDAY\n";
+    if(Z->contains(thu) && Z->contains(mon)) cout << "THURSDAY AND MONDAY\n";
+    *Z -= thu;
+    if(Z->contains(thu)==false) cout << "THURSDAY removed\n";
 
     stl_simple_set<string> U;
     U += "hello";
