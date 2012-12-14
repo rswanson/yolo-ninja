@@ -516,6 +516,37 @@ public:
 
 // insert an appropriate bin_search_range_set declaration here
 
+template<class T, class C = comp<T>, class I = increment<T> >
+class bin_search_range_set: public virtual range_set<T, C>, public virtual bin_search_simple_set<T> {
+    I inc;
+public:
+		bin_search_range_set(T n) : range_set<T, C>(), bin_search_range_set<T>(n)  {}	
+    virtual bin_search_simple_set<T>& operator+=(T item) {
+        return bin_search_simple_set<T>::operator+=(item);
+    }
+    virtual bin_search_simple_set<T>& operator-=(T item) {
+        return bin_search_simple_set<T>::operator-=(item);
+    }
+    virtual bool contains(T item) {
+        return bin_search_simple_set<T>::contains(item);
+    }
+    virtual range_set<T>& operator+=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+					try {	
+            *this += i;
+					} catch (const std::exception& e) {}
+        }
+        return *this;
+    }
+    virtual range_set<T>& operator-=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+					try {
+            *this -= i;
+					} catch (const std::exception& e) {}
+        }
+        return *this;
+    }
+};
 //===============================================================
 
 // comparator for C strings
