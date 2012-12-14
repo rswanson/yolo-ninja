@@ -483,6 +483,35 @@ public:
 //---------------------------------------------------------------
 
 // insert an appropriate hashed_range_set declaration here
+template<class T, class C = comp<T>, class I = increment<T> >
+class hashed_range_set: public virtual range_set<T, C>, public virtual hashed_set<T> {
+    I inc;
+public:
+		hashed_range_set(T n) : range_set<T, C>(), hashed_set<T>(n)  {}	
+    virtual hashed_set<T>& operator+=(T item) {
+        return hashed_set<T>::operator+=(item);
+    }
+    virtual hashed_set<T>& operator-=(T item) {
+        return hashed_set<T>::operator-=(item);
+    }
+    virtual bool contains(T item) {
+        return hashed_set<T>::contains(item);
+    }
+    virtual range_set<T>& operator+=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+            *this += i;
+        }
+        return *this;
+    }
+    virtual range_set<T>& operator-=(range<T, C> r) {
+        for (T i = r.low(); r.contains(i); i = inc(i)) {
+            *this -= i;
+        }
+        return *this;
+    }
+};
+//---------------------------------------------------------------
+
 //---------------------------------------------------------------
 
 // insert an appropriate bin_search_range_set declaration here
@@ -536,12 +565,20 @@ int main() {
 
     if(V->contains(wed)) cout << "WEDNESDAY\n";
     if(Z->contains(fri)) cout << "THURSDAY AND MONDAY\n";
-    if(W->contains(fri)) cout << "FRIDAY IN W\n";
+    if(W->contains(fri)) cout << "FRIDAY IN W\n"; 
+		if(!(W->contains(mon))) cout << "WORKS\n";
     
 		range_set<int>* E = new carray_range_set<int>(1, 5);
 		*E += range<int>(3,5);
 		if (E->contains(1)) cout << "1 is in E\n";
 		if (E->contains(4)) cout << "4 is in E\n";
+		*E -= range<int>(4,5);
+		
+		range_set<int>* H = new hashed_range_set<int>(3);
+		*H += range<int>(1,3);
+		if (H->contains(2)) cout << "2 is in H";
+
+		if (!(E->contains(4))) cout << "4 is NOT in E\n";
 
     stl_simple_set<string> U;
     U += "hello";
