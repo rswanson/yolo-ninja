@@ -1,0 +1,17 @@
+John Blood Hinkel, III
+Ryan Searing Swanson
+Due Date: 12/14/12
+Class: CSC254
+
+Directory Contents:
+      Readme: This file
+      sets.cc: contains the main method that tests our implementation of sets
+      sets.h: contains our implementation of sets.
+
+
+To run the files (all files are to be run only when inside the submitted directory):
+      type "g++ sets.cc" (without quotes) and press enter.  Then type "./a.out" (without quotes) and press enter.
+      
+To clarify, we automatically assumed the following premise for Range sets:
+	  Range sets were implemented by inserting a range of values into the respective data structure as indivdual values from low to high. 
+      Exceptions were caught for bin_search and the others work as directed. 
